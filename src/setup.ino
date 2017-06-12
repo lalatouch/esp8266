@@ -8,6 +8,9 @@
 ESP8266WebServer server(80);
 
 void setupLEDs() {
+	pinMode(2, OUTPUT);
+	digitalWrite(2, LOW);
+
 	for (int i = 12; i <= 14; i++) {
 		pinMode(i, OUTPUT);
 		analogWrite(i, 0);
@@ -66,11 +69,17 @@ void setupHTTPServer() {
 
 	// LED control
 	server.on("/led/on", []() {
-		digitalWrite(12, HIGH);
+		digitalWrite(2, LOW);
 		server.send(200);
 	});
 	server.on("/led/off", []() {
-		digitalWrite(12, LOW);
+		digitalWrite(2, HIGH);
+		server.send(200);
+	});
+	server.on("/led", []() {
+		if (server.hasArg("red"))   analogWrite(12, atoi(server.arg("red").c_str()));
+		if (server.hasArg("green")) analogWrite(13, atoi(server.arg("green").c_str()));
+		if (server.hasArg("blue"))  analogWrite(14, atoi(server.arg("blue").c_str()));
 		server.send(200);
 	});
 
