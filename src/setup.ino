@@ -1,8 +1,18 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
+#include <ESP8266WebServer.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 #include <WiFiManager.h>
+
+ESP8266WebServer server(80);
+
+void setupLEDs() {
+	for (int i = 12; i <= 14; i++) {
+		pinMode(i, OUTPUT);
+		analogWrite(i, 0);
+	}
+}
 
 /**
  * This will automatically setup an AP with captive portal asking you for the
@@ -46,5 +56,24 @@ void setupI2C() {
 	// Begin I2C bus
 	// GPIO4: SDA, GPIO5: SCL
 	Wire.begin(4, 5);
+}
+
+void setupHTTPServer() {
+	// Root route to test stuff
+	server.on("/", []() {
+		server.send(200, "text/plain", "Hello world!");
+	});
+
+	// LED control
+	server.on("/led/on", []() {
+		digitalWrite(12, HIGH);
+		server.send(200);
+	});
+	server.on("/led/off", []() {
+		digitalWrite(12, LOW);
+		server.send(200);
+	});
+
+	server.begin();
 }
 
