@@ -10,6 +10,7 @@ So far, you need the following to run this code :
 - [Arduino "IDE"](https://www.arduino.cc/en/Main/Software)
 - [ESP8266 Core for Arduino](https://github.com/esp8266/Arduino)
 - [WifiManager](https://github.com/tzapu/WiFiManager) library
+- [MPU9250 and quaternionFilters] (https://github.com/sparkfun/SparkFun_MPU-9250_Breakout_Arduino_Library) (Our corresponding code is not written yet)
 
 Then, it is a matter of compiling it and burning it to the ESP. Note that it
 implements OTA updates, thus it needs to be burned serially only once.
