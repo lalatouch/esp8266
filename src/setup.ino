@@ -42,3 +42,9 @@ void setupOTA() {
 	ArduinoOTA.begin();
 }
 
+void setupI2C() {
+	// Begin I2C bus
+	// GPIO4: SDA, GPIO5: SCL
+	Wire.begin(4, 5);
+}
+

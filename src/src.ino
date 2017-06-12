@@ -1,8 +1,5 @@
 #include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
-#include <WiFiUdp.h>
 #include <ArduinoOTA.h>
-#include <WiFiManager.h>
 
 void setup() {
 	// Init serial (debugging)
@@ -13,6 +10,8 @@ void setup() {
 	setupAP();
 	// Setup OTA
 	setupOTA();
+	// Setup I2C
+	setupI2C();
 
 	Serial.println("Ready");
 	Serial.print("IP address: ");
