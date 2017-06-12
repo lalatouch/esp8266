@@ -2,21 +2,15 @@
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
+#include <WiFiManager.h>
 
-const char* ssid = "..........";
-const char* password = "..........";
-
-void setupWiFi() {
-	// Set as wifi client
-	WiFi.mode(WIFI_STA);
-	WiFi.begin(ssid, password);
-
-	// Connect to network
-	while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-		Serial.println("Connection Failed! Rebooting...");
-		delay(5000);
-		ESP.restart();
-	}
+/**
+ * This will automatically setup an AP with captive portal asking you for the
+ * wifi network you want to connect to.
+ */
+void setupAP() {
+	WiFiManager wifiManager;
+	wifiManager.autoConnect("LalaTouch", "LalaThing");
 }
 void setupOTA() {
 	// Port defaults to 8266
@@ -53,8 +47,8 @@ void setup() {
 	Serial.begin(115200);
 	Serial.println("Booting");
 
-	// Setup WiFi
-	setupWiFi();
+	// Setup manager
+	setupAP();
 	// Setup OTA
 	setupOTA();
 
