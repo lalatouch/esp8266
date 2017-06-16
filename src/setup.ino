@@ -5,6 +5,8 @@
 #include <ArduinoOTA.h>
 #include <WiFiManager.h>
 
+#include "led.h"
+
 ESP8266WebServer server(80);
 
 /**
@@ -59,17 +61,17 @@ void setupHTTPServer() {
 
 	// LED control
 	server.on("/led/on", []() {
-		digitalWrite(2, HIGH);
+		led::on(led::ONBOARD);
 		server.send(200);
 	});
 	server.on("/led/off", []() {
-		digitalWrite(2, LOW);
+		led::off(led::ONBOARD);
 		server.send(200);
 	});
 	server.on("/led", []() {
-		if (server.hasArg("red"))   analogWrite(14, atoi(server.arg("red").c_str()));
-		if (server.hasArg("green")) analogWrite(12, atoi(server.arg("green").c_str()));
-		if (server.hasArg("blue"))  analogWrite(13, atoi(server.arg("blue").c_str()));
+		if (server.hasArg("red"))   led::pwm(led::RGB_R, atoi(server.arg("red").c_str()));
+		if (server.hasArg("green")) led::pwm(led::RGB_G, atoi(server.arg("green").c_str()));
+		if (server.hasArg("blue"))  led::pwm(led::RGB_B, atoi(server.arg("blue").c_str()));
 		server.send(200);
 	});
 
