@@ -7,16 +7,6 @@
 
 ESP8266WebServer server(80);
 
-void setupLEDs() {
-	pinMode(2, OUTPUT);
-	digitalWrite(2, LOW);
-
-	for (int i = 12; i <= 14; i++) {
-		pinMode(i, OUTPUT);
-		analogWrite(i, 0);
-	}
-}
-
 /**
  * This will automatically setup an AP with captive portal asking you for the
  * wifi network you want to connect to.

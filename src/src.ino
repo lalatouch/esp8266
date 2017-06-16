@@ -2,6 +2,8 @@
 #include <ESP8266WebServer.h>
 #include <ArduinoOTA.h>
 
+#include "led.h"
+
 extern ESP8266WebServer server;
 
 void setup() {
@@ -10,7 +12,7 @@ void setup() {
 	Serial.println("Booting");
 
 	// Setup LEDs
-	setupLEDs();
+	led::setup();
 	// Setup manager
 	setupAP();
 	// Setup OTA
