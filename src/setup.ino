@@ -69,17 +69,17 @@ void setupHTTPServer() {
 
 	// LED control
 	server.on("/led/on", []() {
-		digitalWrite(2, LOW);
-		server.send(200);
-	});
-	server.on("/led/off", []() {
 		digitalWrite(2, HIGH);
 		server.send(200);
 	});
+	server.on("/led/off", []() {
+		digitalWrite(2, LOW);
+		server.send(200);
+	});
 	server.on("/led", []() {
-		if (server.hasArg("red"))   analogWrite(12, atoi(server.arg("red").c_str()));
-		if (server.hasArg("green")) analogWrite(13, atoi(server.arg("green").c_str()));
-		if (server.hasArg("blue"))  analogWrite(14, atoi(server.arg("blue").c_str()));
+		if (server.hasArg("red"))   analogWrite(14, atoi(server.arg("red").c_str()));
+		if (server.hasArg("green")) analogWrite(12, atoi(server.arg("green").c_str()));
+		if (server.hasArg("blue"))  analogWrite(13, atoi(server.arg("blue").c_str()));
 		server.send(200);
 	});
 
