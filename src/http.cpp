@@ -1,8 +1,13 @@
+#include <ESP8266WebServer.h>
+
+#include "http.h"
 #include "led.h"
+
+namespace http {
 
 ESP8266WebServer server(80);
 
-void setupHTTPServer() {
+void setup() {
 	// Root route to test stuff
 	server.on("/", []() {
 		server.send(200, "text/plain", "Hello world!");
@@ -25,5 +30,11 @@ void setupHTTPServer() {
 	});
 
 	server.begin();
+}
+
+void handle() {
+	server.handleClient();
+}
+
 }
 

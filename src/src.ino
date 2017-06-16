@@ -1,11 +1,9 @@
 #include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
 
 #include "led.h"
 #include "wifi.h"
 #include "i2c.h"
-
-extern ESP8266WebServer server;
+#include "http.h"
 
 void setup() {
 	// Init serial (debugging)
@@ -19,7 +17,7 @@ void setup() {
 	// Setup I2C
 	i2c::setup();
 	// Setup HTTP
-	setupHTTPServer();
+	http::setup();
 
 	Serial.println("Ready");
 	Serial.print("IP address: ");
@@ -28,6 +26,6 @@ void setup() {
 
 void loop() {
 	wifi::handleOTA();
-	server.handleClient();
+	http::handle();
 }
 
