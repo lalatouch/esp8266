@@ -1,10 +1,14 @@
+#include <Arduino.h>
 #include <Wire.h>
 
 namespace i2c {
 
-/**
- * Scans the I2C bus and prints the addresses of the found devices to the serial
- */
+void setup() {
+	// GPIO 4: SDA
+	// GPIO 5: SCL
+	Wire.begin(4, 5);
+}
+
 void scan() {
 	Serial.println("Scanning I2C devices...");
 	for (int i = 1; i < 128; i++) {

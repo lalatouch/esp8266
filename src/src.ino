@@ -3,6 +3,7 @@
 
 #include "led.h"
 #include "wifi.h"
+#include "i2c.h"
 
 extern ESP8266WebServer server;
 
@@ -16,7 +17,7 @@ void setup() {
 	// Setup manager and OTA
 	wifi::setup();
 	// Setup I2C
-	setupI2C();
+	i2c::setup();
 	// Setup HTTP
 	setupHTTPServer();
 

@@ -2,12 +2,6 @@
 
 ESP8266WebServer server(80);
 
-void setupI2C() {
-	// Begin I2C bus
-	// GPIO4: SDA, GPIO5: SCL
-	Wire.begin(4, 5);
-}
-
 void setupHTTPServer() {
 	// Root route to test stuff
 	server.on("/", []() {
