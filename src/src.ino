@@ -1,8 +1,8 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-#include <ArduinoOTA.h>
 
 #include "led.h"
+#include "wifi.h"
 
 extern ESP8266WebServer server;
 
@@ -13,10 +13,8 @@ void setup() {
 
 	// Setup LEDs
 	led::setup();
-	// Setup manager
-	setupAP();
-	// Setup OTA
-	setupOTA();
+	// Setup manager and OTA
+	wifi::setup();
 	// Setup I2C
 	setupI2C();
 	// Setup HTTP
@@ -28,7 +26,7 @@ void setup() {
 }
 
 void loop() {
-	ArduinoOTA.handle();
+	wifi::handleOTA();
 	server.handleClient();
 }
 
