@@ -2,6 +2,7 @@
 #include <MPU9250.h>
 
 #include "imu.h"
+#include "led.h"
 
 // Shorthand define
 #define MPU_ADDR MPU9250_ADDRESS
@@ -50,18 +51,48 @@ void handle() {
 		mpu.readAccelData(mpu.accelCount);
 		mpu.readGyroData(mpu.gyroCount);
 
-		Serial.print(mpu.accelCount[0] / 10);
-		Serial.print("\t");
-		Serial.print(mpu.accelCount[1] / 10);
-		Serial.print("\t");
-		Serial.print(mpu.accelCount[2] / 10);
-		Serial.print("\t");
-		Serial.print(mpu.gyroCount[0] / 10);
-		Serial.print("\t");
-		Serial.print(mpu.gyroCount[1] / 10);
-		Serial.print("\t");
-		Serial.print(mpu.gyroCount[2] / 10);
-		Serial.print("\r");
+		// Fetch resolutions
+		mpu.getAres();
+		mpu.getGres();
+
+		// Convert to Gs
+		mpu.ax = (float)mpu.accelCount[0] * mpu.aRes - mpu.accelBias[0];
+		mpu.ay = (float)mpu.accelCount[1] * mpu.aRes - mpu.accelBias[1];
+		mpu.az = (float)mpu.accelCount[2] * mpu.aRes - mpu.accelBias[2];
+		// Convert to rad/s
+		mpu.gx = ((float)mpu.gyroCount[0] * mpu.gRes - mpu.gyroBias[0]) * DEG_TO_RAD;
+		mpu.gy = ((float)mpu.gyroCount[1] * mpu.gRes - mpu.gyroBias[1]) * DEG_TO_RAD;
+		mpu.gz = ((float)mpu.gyroCount[2] * mpu.gRes - mpu.gyroBias[2]) * DEG_TO_RAD;
+
+		// Compute norms
+		float acc = mpu.ax * mpu.ax + mpu.ay * mpu.ay + mpu.az * mpu.az,
+		      gyro = mpu.gx * mpu.gx + mpu.gy * mpu.gy + mpu.gz * mpu.gz;
+
+		if (1 == 2) {
+			Serial.print(mpu.ax);
+			Serial.print("\t");
+			Serial.print(mpu.ay);
+			Serial.print("\t");
+			Serial.print(mpu.az);
+			Serial.print("\t");
+			Serial.print(mpu.gx);
+			Serial.print("\t");
+			Serial.print(mpu.gy);
+			Serial.print("\t");
+			Serial.print(mpu.gz);
+			Serial.print("\t");
+			Serial.print(acc);
+			Serial.print("\t");
+			Serial.print(gyro);
+			Serial.print("\r");
+		}
+
+		if (acc >= 5.0) led::on(led::ONBOARD);
+		else            led::off(led::ONBOARD);
+
+		if (gyro >= 0.1 && gyro < 15.0) led::pwm(led::RGB_R, 32);
+		else if (gyro >= 15.0)          led::pwm(led::RGB_R, 128);
+		else                            led::pwm(led::RGB_R, 0);
 
 		// Clear up MPU's interrupt flag
 		read(INT_STATUS);
