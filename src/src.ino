@@ -4,6 +4,7 @@
 #include "wifi.h"
 #include "i2c.h"
 #include "http.h"
+#include "imu.h"
 
 void setup() {
 	// Init serial (debugging)
@@ -18,6 +19,8 @@ void setup() {
 	i2c::setup();
 	// Setup HTTP
 	http::setup();
+	// Setup IMU
+	imu::setup();
 
 	Serial.println("Ready");
 	Serial.print("IP address: ");
