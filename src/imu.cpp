@@ -14,7 +14,9 @@ namespace imu {
 // Our actual IMU
 static MPU9250 mpu;
 
-static void onMPUData();
+// Interrupt data
+static volatile bool readIMU = false;
+
 static inline uint8_t read(const uint8_t reg);
 static inline void write(const uint8_t reg, const uint8_t val);
 
@@ -36,12 +38,35 @@ void setup() {
 	// Setup interrupt pin (input, active high, push-pull)
 	pinMode(INT_PIN, INPUT);
 	digitalWrite(INT_PIN, LOW);
-	attachInterrupt(digitalPinToInterrupt(INT_PIN), onMPUData, RISING);
+	attachInterrupt(digitalPinToInterrupt(INT_PIN), []() { readIMU = true; }, RISING);
+
+	// Clear the interrupt flag
+	read(INT_STATUS);
 }
 
-static void onMPUData() {
-	Serial.print("INT_STATUS: ");
-	Serial.println(read(INT_STATUS), HEX);
+void handle() {
+	if (readIMU) {
+		// Fetch IMU data
+		mpu.readAccelData(mpu.accelCount);
+		mpu.readGyroData(mpu.gyroCount);
+
+		Serial.print(mpu.accelCount[0] / 10);
+		Serial.print("\t");
+		Serial.print(mpu.accelCount[1] / 10);
+		Serial.print("\t");
+		Serial.print(mpu.accelCount[2] / 10);
+		Serial.print("\t");
+		Serial.print(mpu.gyroCount[0] / 10);
+		Serial.print("\t");
+		Serial.print(mpu.gyroCount[1] / 10);
+		Serial.print("\t");
+		Serial.print(mpu.gyroCount[2] / 10);
+		Serial.print("\r");
+
+		// Clear up MPU's interrupt flag
+		read(INT_STATUS);
+		readIMU = false;
+	}
 }
 
 static inline uint8_t read(const uint8_t reg) {

@@ -25,10 +25,13 @@ void setup() {
 	Serial.println("Ready");
 	Serial.print("IP address: ");
 	Serial.println(WiFi.localIP());
+
+	Serial.println("Ax\tAy\tAz\tGx\tGy\tGz");
 }
 
 void loop() {
 	wifi::handleOTA();
 	http::handle();
+	imu::handle();
 }
 

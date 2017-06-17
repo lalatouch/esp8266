@@ -7,6 +7,7 @@ namespace imu {
  * Sets up the IMU
  */
 void setup();
+void handle();
 
 }
 
