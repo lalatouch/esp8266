@@ -11,11 +11,12 @@
 
 namespace imu {
 
-MPU9250 mpu;
+// Our actual IMU
+static MPU9250 mpu;
 
-void onMPUData();
-inline uint8_t read(const uint8_t reg);
-inline void write(const uint8_t reg, const uint8_t val);
+static void onMPUData();
+static inline uint8_t read(const uint8_t reg);
+static inline void write(const uint8_t reg, const uint8_t val);
 
 /**
  * Main setup function
@@ -38,15 +39,15 @@ void setup() {
 	attachInterrupt(digitalPinToInterrupt(INT_PIN), onMPUData, RISING);
 }
 
-void onMPUData() {
+static void onMPUData() {
 	Serial.print("INT_STATUS: ");
 	Serial.println(read(INT_STATUS), HEX);
 }
 
-inline uint8_t read(const uint8_t reg) {
+static inline uint8_t read(const uint8_t reg) {
 	return mpu.readByte(MPU_ADDR, reg);
 }
-inline void write(const uint8_t reg, const uint8_t val) {
+static inline void write(const uint8_t reg, const uint8_t val) {
 	mpu.writeByte(MPU_ADDR, reg, val);
 }
 
