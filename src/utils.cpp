@@ -117,7 +117,7 @@ int setInterval(CallbackFn f, int ms, int count = -1) {
 	return -1;
 }
 void unsetInterval(int id) {
-	if (id < 0 || >= MAX_INTERVALS) return;
+	if (id < 0 || id >= MAX_INTERVALS) return;
 
 	intervals[id].interval = 0;
 	intervals[id].current = 0;
