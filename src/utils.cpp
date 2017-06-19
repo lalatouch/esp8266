@@ -98,7 +98,7 @@ bool setTimeout(CallbackFn f, int ms) {
  *               infinite
  * @return       true if added successfully
  */
-int setInterval(CallbackFn f, int ms, int count = -1) {
+int setInterval(CallbackFn f, int ms, int count) {
 	int now = millis();
 
 	if (ms <= 0) return -1;
