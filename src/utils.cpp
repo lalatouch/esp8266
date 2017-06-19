@@ -16,6 +16,12 @@ void setup() {
 }
 
 void handle() {
+	int now = millis();
+
+	// Check all timeouts
+	for (int i = 0; i < MAX_TIMEOUTS; i++)
+		if (timeouts[i].first != 0 && timeouts[i].first < now)
+			timeouts[i].second();
 }
 
 /**
