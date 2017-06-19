@@ -34,6 +34,12 @@ bool setTimeout(CallbackFn f, int ms);
  * @return       Interval ID. -1 if it could not be set
  */
 int setInterval(CallbackFn f, int ms, int count);
+/**
+ * Cancels a previously set interval set by setInterval using the interval ID
+ * returned by setInterval
+ * @param id     Interval ID
+ */
+void unsetInterval(int id);
 
 }
 
