@@ -16,6 +16,15 @@ void setup();
  */
 void handle();
 
+typedef std::function<void(void)> CallbackFn;
+/**
+ * Used to call a function at a later time
+ * @param f    the function to call
+ * @param ms   in how many miliseconds should we call the function
+ * @return     true if successful, else false
+ */
+bool setTimeout(CallbackFn f, int ms);
+
 }
 
 #endif
