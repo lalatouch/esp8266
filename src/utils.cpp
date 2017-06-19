@@ -60,6 +60,11 @@ void handle() {
 			timeouts[i].second();
 			timeouts[i].first = 0;
 		}
+
+	// Check all intervals
+	for (int i = 0; i < MAX_INTERVALS; i++)
+		if (intervals[i].interval != 0 && intervals[i].next() < millis())
+			intervals[i]();
 }
 
 /**

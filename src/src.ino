@@ -31,6 +31,17 @@ void setup() {
 	utils::setTimeout([]() { led::pwm(led::RGB_R, 256); }, 1000);
 	utils::setTimeout([]() { led::pwm(led::RGB_G, 256); }, 2000);
 	utils::setTimeout([]() { led::pwm(led::RGB_B, 256); }, 3000);
+	utils::setTimeout([]() {
+		led::pwm(led::RGB_R, 0);
+		led::pwm(led::RGB_G, 0);
+		led::pwm(led::RGB_B, 0);
+	}, 4000);
+
+	utils::setInterval([]() {
+		ledstate = ledstate == LOW ? HIGH : LOW;
+		if (ledstate == LOW) led::on(led::ONBOARD);
+		else                 led::off(led::ONBOARD);
+	}, 500, 10);
 }
 
 void loop() {
