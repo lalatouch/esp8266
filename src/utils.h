@@ -31,9 +31,9 @@ bool setTimeout(CallbackFn f, int ms);
  * @param ms     calling period
  * @param count  How many times the function should be called. Pass -1 for
  *               infinite
- * @return       true if added successfully
+ * @return       Interval ID. -1 if it could not be set
  */
-bool setInterval(CallbackFn f, int ms, int count);
+int setInterval(CallbackFn f, int ms, int count);
 
 }
 

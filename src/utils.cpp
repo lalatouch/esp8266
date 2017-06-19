@@ -98,10 +98,10 @@ bool setTimeout(CallbackFn f, int ms) {
  *               infinite
  * @return       true if added successfully
  */
-bool setInterval(CallbackFn f, int ms, int count = -1) {
+int setInterval(CallbackFn f, int ms, int count = -1) {
 	int now = millis();
 
-	if (ms <= 0) return false;
+	if (ms <= 0) return -1;
 
 	for (int i = 0; i < MAX_INTERVALS; i++)
 		// Find an available slot
@@ -111,10 +111,10 @@ bool setInterval(CallbackFn f, int ms, int count = -1) {
 			intervals[i].interval = ms;
 			intervals[i].count = count;
 
-			return true;
+			return i;
 		}
 
-	return false;
+	return -1;
 }
 
 }
