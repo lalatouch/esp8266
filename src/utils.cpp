@@ -4,15 +4,53 @@
 #include "utils.h"
 
 #define MAX_TIMEOUTS 16
+#define MAX_INTERVALS 16
 
 namespace utils {
 
 // Array containing all the timeouts
 std::pair<int, CallbackFn> timeouts[MAX_TIMEOUTS];
 
+// Interval stuff
+typedef struct Interval {
+	CallbackFn f;    // Function to be called
+	int start,       // Timestamp at which it started (ms)
+	    interval,    // Milliseconds between each call
+	    count,       // How many times the function shall be called, -1 for
+	                 // infinite
+	    current;     // Current call count
+
+	/**
+	 * Gives the next time the function is due
+	 * @return timestamp for the next call
+	 */
+	inline int next() const {
+		return start + (current + 1) * interval;
+	}
+
+	/**
+	 * Handles one call to the function
+	 */
+	void operator()() {
+		f();
+		current++;
+
+		if (count != -1 && current >= count) {
+			// Mark as available
+			interval = 0;
+			current = 0;
+		}
+	}
+} Interval;
+// All intervals
+Interval intervals[MAX_INTERVALS];
+
 void setup() {
 	// Cleanup all timeout pairs
 	for (int i = 0; i < MAX_TIMEOUTS; i++) timeouts[i].first = 0;
+
+	// Cleanup all intervals
+	for (int i = 0; i < MAX_INTERVALS; i++) intervals[i].interval = 0;
 }
 
 void handle() {
