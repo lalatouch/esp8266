@@ -14,6 +14,8 @@ void setup() {
 	Serial.begin(115200);
 	Serial.println("Booting");
 
+	// Setup misc. utils
+	utils::setup();
 	// Setup LEDs
 	led::setup();
 	// Setup manager and OTA
@@ -24,8 +26,6 @@ void setup() {
 	http::setup();
 	// Setup IMU
 	imu::setup();
-	// Setup misc. utils
-	utils::setup();
 
 	Serial.println("Ready");
 	Serial.print("IP address: ");
