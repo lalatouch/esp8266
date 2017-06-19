@@ -90,9 +90,9 @@ void handle() {
 		if (acc >= 5.0) led::on(led::ONBOARD);
 		else            led::off(led::ONBOARD);
 
-		if (gyro >= 0.1 && gyro < 15.0) led::pwm(led::RGB_R, 32);
-		else if (gyro >= 15.0)          led::pwm(led::RGB_R, 128);
-		else                            led::pwm(led::RGB_R, 0);
+		if (abs(mpu.gz) >= 1.0 && abs(mpu.gz) < 4.0) led::pwm(led::RGB_R, 16);
+		else if (abs(mpu.gz) >= 4.0)                 led::pwm(led::RGB_R, 256);
+		else                                         led::pwm(led::RGB_R, 0);
 
 		// Clear up MPU's interrupt flag
 		read(INT_STATUS);
