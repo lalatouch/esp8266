@@ -85,5 +85,32 @@ bool setTimeout(CallbackFn f, int ms) {
 	return false;
 }
 
+/**
+ * Used to call a function at regular intervals
+ * @param f      the function to call
+ * @param ms     calling period
+ * @param count  How many times the function should be called. Pass -1 for
+ *               infinite
+ * @return       true if added successfully
+ */
+bool setInterval(CallbackFn f, int ms, int count = -1) {
+	int now = millis();
+
+	if (ms <= 0) return false;
+
+	for (int i = 0; i < MAX_INTERVALS; i++)
+		// Find an available slot
+		if (intervals[i].interval == 0) {
+			intervals[i].f = f;
+			intervals[i].start = now;
+			intervals[i].interval = ms;
+			intervals[i].count = count;
+
+			return true;
+		}
+
+	return false;
+}
+
 }
 

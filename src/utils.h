@@ -25,6 +25,16 @@ typedef std::function<void(void)> CallbackFn;
  */
 bool setTimeout(CallbackFn f, int ms);
 
+/**
+ * Used to call a function at regular intervals
+ * @param f      the function to call
+ * @param ms     calling period
+ * @param count  How many times the function should be called. Pass -1 for
+ *               infinite
+ * @return       true if added successfully
+ */
+bool setInterval(CallbackFn f, int ms, int count);
+
 }
 
 #endif
