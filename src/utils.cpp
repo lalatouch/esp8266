@@ -16,12 +16,12 @@ void setup() {
 }
 
 void handle() {
-	int now = millis();
-
 	// Check all timeouts
 	for (int i = 0; i < MAX_TIMEOUTS; i++)
-		if (timeouts[i].first != 0 && timeouts[i].first < now)
+		if (timeouts[i].first != 0 && timeouts[i].first < millis()) {
 			timeouts[i].second();
+			timeouts[i].first = 0;
+		}
 }
 
 /**
@@ -38,15 +38,8 @@ bool setTimeout(CallbackFn f, int ms) {
 	for (int i = 0; i < MAX_TIMEOUTS; i++)
 		// If we find an available slot in the timeouts
 		if (timeouts[i].first == 0) {
-
-			// Store function
 			timeouts[i].first = now + ms;
-			timeouts[i].second = [&f, i]() {
-				// Call callback
-				f();
-				// Cleanup
-				timeouts[i].first = 0;
-			};
+			timeouts[i].second = f;
 			return true;
 		}
 

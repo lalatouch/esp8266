@@ -6,6 +6,8 @@
 #include "http.h"
 #include "utils.h"
 
+int ledstate = LOW;
+
 void setup() {
 	// Init serial (debugging)
 	Serial.begin(115200);
@@ -25,6 +27,10 @@ void setup() {
 	Serial.println("Ready");
 	Serial.print("IP address: ");
 	Serial.println(WiFi.localIP());
+
+	utils::setTimeout([]() { led::pwm(led::RGB_R, 256); }, 1000);
+	utils::setTimeout([]() { led::pwm(led::RGB_G, 256); }, 2000);
+	utils::setTimeout([]() { led::pwm(led::RGB_B, 256); }, 3000);
 }
 
 void loop() {
