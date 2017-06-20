@@ -1,6 +1,8 @@
 #ifndef _UTILS_H
 #define _UTILS_H
 
+#include <functional>
+
 /**
  * This file contains misc utilities useful when developing
  */
@@ -33,7 +35,7 @@ bool setTimeout(CallbackFn f, int ms);
  *               infinite
  * @return       Interval ID. -1 if it could not be set
  */
-int setInterval(CallbackFn f, int ms, int count);
+int setInterval(CallbackFn f, int ms, int count = -1);
 /**
  * Cancels a previously set interval set by setInterval using the interval ID
  * returned by setInterval
