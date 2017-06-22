@@ -13,21 +13,22 @@
 
 using namespace std;
 
-namespace gestureNS {
-    class gesture {
+namespace gesture {
 
-        
+    class Gesture {
+
+
     public:
         // Add a new acceleration, gyroscope and magnetometer data point
         void addNewDataPoint(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float accelerationNorm, float rotationNorm);
-        // 
+        //
         const void recognizeGesture();
-        
+
     private:
         bool logDebug = true;
-        
+
         /* Thresholds for determining if a gesture is significative */
-        
+
         // If a gesture has more than this threshold of uninteresting points, we consider the gesture is finished
         static constexpr int numberOfUninterestingDataPointsThreshold = 100;
         // If the rotation norm of a datapoint is superior to this threshold, it is a rotation
@@ -38,11 +39,11 @@ namespace gestureNS {
         static constexpr float accelerationNormThreshold = 2.0f;
         static constexpr float shakeThreshold = 2.0f;
         static constexpr float sumScalarProductsThreshold = 5.0f;
-        
+
         vector<vector<float> > dataPoints;
         vector<vector<float> > currentGesture;
         int numberOfUninterestingDataPoints = 0;
-        
+
         void addNewDataPoint(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz);
         vector<vector<float> > computeAccelerationDifferences(vector<vector<float> > accelerationPoints);
         const bool isInterestingDataPoint(const float accelerationNorm, const float rotationNorm);
@@ -54,7 +55,7 @@ namespace gestureNS {
         void analyzeCurrentData();
         void streamRotation();
         const float getCurrentGestureAccelerationNormSum();
-        
+
         // Gestures enumeration
         enum gestures {
             GESTURE_NONE,
@@ -65,22 +66,22 @@ namespace gestureNS {
             GESTURE_LEFT_RIGHT
         };
         int previousGesture = GESTURE_NONE;
-        
+
         // State machine
         enum states {
             STATE_IDLE,
             STATE_LISTENING_GESTURE
         };
         int currentState = STATE_IDLE;
-        
+
         // Maths functions
         vector<vector<float> > normalize2DVector(vector<vector<float> > points);
-        
+
         // Helper function
         void logD(string s); // Log a debug string
         template<class R>
         vector<R> initializeVector2(R arg1, R arg2);
-        
+
     };
 }
 

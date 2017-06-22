@@ -17,10 +17,10 @@
 
 using namespace std;
 
-namespace gestureNS {
-    
+namespace gesture {
+
     // Add a new accelerometer, gyroscope and magnetometer entry to our data
-    void gesture::addNewDataPoint(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz){
+    void Gesture::addNewDataPoint(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz){
         float accelerationNorm = cbrt(ax*ax+ay*ay+az*az);
         float rotationNorm = cbrt(gx*gx+gy*gy+gz*gz);
         vector<float> newPoint {ax, ay, az, gx, gy, gz, mx, my, mz, accelerationNorm, rotationNorm};
@@ -41,23 +41,23 @@ namespace gestureNS {
             }
         }
     }
-    
+
     // Determine if the point might be the beginning of a new gesture, depending of the accceleration and gyroscopic norm
-    const bool gesture::isInterestingDataPoint(const float accelerationNorm, const float rotationNorm){
+    const bool Gesture::isInterestingDataPoint(const float accelerationNorm, const float rotationNorm){
         if (accelerationNorm > accelerationNormThreshold || rotationNorm > rotationNormThreshold)
             return true;
         return false;
     }
-    
+
     // Analyze current data to determine if it is a gesture
-    void gesture::analyzeCurrentData(){
+    void Gesture::analyzeCurrentData(){
         currentGesture = dataPoints;
         dataPoints.clear();
         recognizeGesture();
     }
-    
+
     // Recognize a gesture
-    const void gesture::recognizeGesture(){
+    const void Gesture::recognizeGesture(){
         // We first detect the beginning of a rotation to give priority to this type of gesture
         if (isRotationGesture()) {
             logD("Starting to stream rotation.");
@@ -69,40 +69,40 @@ namespace gestureNS {
                     // Send a shake command
                     logD("Sending shake command.");
                     break;
-                    
+
                 case GESTURE_RIGHT:
                     // If the state is normal, send a fast forward command
                     // If the state is fast backwards, send a stop forward
                     logD("Sending gesture right command.");
                     break;
-                    
+
                 case GESTURE_LEFT:
                     // If the state is normal, send a fast backward command
                     // If the state is fast forward, send a stop forward
                     logD("Sending gesture left command.");
                     break;
-                    
+
                 case GESTURE_RIGHT_LEFT:
                     // Send a next song command
                     logD("Sending gesture right left command.");
                     break;
-                    
+
                 case GESTURE_LEFT_RIGHT:
                     // Send a previous song command
                     logD("Sending gesture left right command.");
                     break;
-                    
+
                 default:
                     logD("No gesture recognized.");
                     break;
             }
         }
-        
+
     }
-    
+
     // Returns true if the gesture has a rotation accelaration above the threshold
     //TODO: Also verify that the acceleration is low?
-    const bool gesture::isRotationGesture(){
+    const bool Gesture::isRotationGesture(){
         float rotationNormSum = 0.0f;
         for (int i=0; i<currentGesture.size()/4; i++){
             rotationNormSum+= currentGesture[i][10];
@@ -112,8 +112,8 @@ namespace gestureNS {
         }
         return false;
     }
-    
-    const int gesture::recognizeLinearGesture(){
+
+    const int Gesture::recognizeLinearGesture(){
         // If the acceleration norms sum is high, the gesture is a shake gesture
         if (getCurrentGestureAccelerationNormSum() > shakeThreshold){
             return GESTURE_SHAKE;
@@ -138,25 +138,25 @@ namespace gestureNS {
                 return GESTURE_NONE;
             }
         }
-        
+
     }
-    
+
     // Send rotation data to change the music level
-    void gesture::streamRotation(){
-        
+    void Gesture::streamRotation(){
+
     }
-    
+
     // Get the sum of the norms of each acceleration datatpoint from the gesture
-    const float gesture::getCurrentGestureAccelerationNormSum(){
+    const float Gesture::getCurrentGestureAccelerationNormSum(){
         float accelerationNormSum = 0.0f;
         for (int i=0; i<currentGesture.size(); i++){
             accelerationNormSum+= currentGesture[i][9];
         }
         return accelerationNormSum;
     }
-    
+
     // Compute the acceleration differences in the xy plane between consecutive data points
-    vector<vector<float> > gesture::computeAccelerationDifferences(vector<vector<float> > accelerationPoints){
+    vector<vector<float> > Gesture::computeAccelerationDifferences(vector<vector<float> > accelerationPoints){
         vector<vector<float> > result;
         vector<float> newPoint;
         for (int i=0; i<accelerationPoints.size()-1; i++){
@@ -165,10 +165,10 @@ namespace gestureNS {
         }
         return result;
     }
-    
+
     // Normalize the acceleration differences vector
     // Maybe apply a passe bas ?
-    vector<vector<float> > gesture::normalize2DVector(vector<vector<float> > points){
+    vector<vector<float> > Gesture::normalize2DVector(vector<vector<float> > points){
         vector<vector<float> > result;
         vector<float> newPoint;
         for (int i=0; i<points.size(); i++){
@@ -178,9 +178,9 @@ namespace gestureNS {
         }
         return result;
     }
-    
+
     // Check if the acceleration gives aligned points = if the sum of all absolute scalar products is close to the number of points
-    const bool gesture::isLineGesture(vector<vector<float> > normalizedAccelerationPoints){
+    const bool Gesture::isLineGesture(vector<vector<float> > normalizedAccelerationPoints){
         float sumScalarProducts = 0.0f;
         int pointsSize = normalizedAccelerationPoints.size();
         for (int i=0; i<pointsSize-1; i++){
@@ -191,15 +191,15 @@ namespace gestureNS {
         }
         return false;
     }
-    
+
     // Check if the beginning of the linear gesture is towards the right
-    const bool gesture::isLinearGestureToTheRight(){
+    const bool Gesture::isLinearGestureToTheRight(){
         //TODO
         return true;
     }
-    
+
     // Returns true if the gesture is unidirectional, else it is bi-directional = check the scalar product of the mean of the first 1/4 of points with the last 1/4 points
-    bool gesture::isUnidirectionalGesture(vector<vector<float> > accelerationPoints){
+    bool Gesture::isUnidirectionalGesture(vector<vector<float> > accelerationPoints){
         vector<float> sumFirstPoints{ 0.0f, 0.0f };
         vector<float> sumLastPoints{ 0.0f, 0.0f };
         int pointsSize = accelerationPoints.size();
@@ -209,29 +209,27 @@ namespace gestureNS {
             sumLastPoints[0]+= accelerationPoints[pointsSize-1-i][0];
             sumLastPoints[1]+= accelerationPoints[pointsSize-1-i][1];
         }
-        
+
         float scalarProduct = sumFirstPoints[0]*sumLastPoints[0] + sumFirstPoints[1]*sumLastPoints[1];
         return (scalarProduct>0);
     }
-    
+
     /* Helper functions */
-    
+
     // Log a string if debug mode is enabled
-    void gesture::logD(string s){
+    void Gesture::logD(string s){
         if (logDebug) {
             cout << s;
         }
     }
-    
+
     // Initialiise a vector with given values
     template<class R>
-    vector<R> gesture::initializeVector2(R arg1, R arg2){
+    vector<R> Gesture::initializeVector2(R arg1, R arg2){
         vector<R> result;
         result.push_back(arg1);
         result.push_back(arg2);
         return result;
     }
-    
-    
 
 }
