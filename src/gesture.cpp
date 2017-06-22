@@ -22,8 +22,8 @@ void Gesture::addNewDataPoint(
 	float gx, float gy, float gz,
 	float mx, float my, float mz
 ) {
-	float accelerationNorm = cbrt(ax*ax+ay*ay+az*az);
-	float rotationNorm = cbrt(gx*gx+gy*gy+gz*gz);
+	float accelerationNorm = ax*ax + ay*ay + az*az;
+	float rotationNorm = gx*gx + gy*gy + gz*gz;
 	vector<float> newPoint {
 		ax, ay, az,
 		gx, gy, gz,
