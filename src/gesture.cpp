@@ -123,7 +123,7 @@ const bool Gesture::isRotationGesture() {
 		rotationNormSum += currentGesture[i][10];
 	}
 	return rotationNormSum >
-	       rotationNormThresholdPercent * currentGesture.size() / 4 * rotationNormThreshold
+	       rotationNormThresholdPercent * currentGesture.size() / 4 * rotationNormThreshold;
 }
 
 const int Gesture::recognizeLinearGesture() {
