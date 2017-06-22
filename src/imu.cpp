@@ -3,6 +3,7 @@
 
 #include "imu.h"
 #include "led.h"
+#include "gesture.h"
 
 // Shorthand define
 #define MPU_ADDR MPU9250_ADDRESS
@@ -17,6 +18,9 @@ static MPU9250 mpu;
 
 // Interrupt data
 static volatile bool readIMU = false;
+
+// Gesture recognizer
+static gesture::Gesture recognizer;
 
 static inline uint8_t read(const uint8_t reg);
 static inline void write(const uint8_t reg, const uint8_t val);
@@ -93,6 +97,13 @@ void handle() {
 		if (abs(mpu.gz) >= 1.0 && abs(mpu.gz) < 4.0) led::pwm(led::RGB_R, 16);
 		else if (abs(mpu.gz) >= 4.0)                 led::pwm(led::RGB_R, 256);
 		else                                         led::pwm(led::RGB_R, 0);
+
+		// Send it to the gesture recognizer
+		recognizer.addNewDataPoint(
+			mpu.ax, mpu.ay, mpu.az,
+			mpu.gx, mpu.gy, mpu.gz,
+			0.f, 0.f, 0.f
+		);
 
 		// Clear up MPU's interrupt flag
 		read(INT_STATUS);

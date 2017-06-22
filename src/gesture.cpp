@@ -10,7 +10,6 @@
 #include <cmath>
 #include "gesture.h"
 
-//TODO not working
 #include <Arduino.h>
 
 using namespace std;

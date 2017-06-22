@@ -22,6 +22,7 @@ namespace gesture {
     public:
         // Add a new acceleration, gyroscope and magnetometer data point
         void addNewDataPoint(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float accelerationNorm, float rotationNorm);
+        void addNewDataPoint(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz);
         //
         const void recognizeGesture();
 
@@ -45,7 +46,6 @@ namespace gesture {
         vector<vector<float> > currentGesture;
         int numberOfUninterestingDataPoints = 0;
 
-        void addNewDataPoint(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz);
         vector<vector<float> > computeAccelerationDifferences(vector<vector<float> > accelerationPoints);
         const bool isInterestingDataPoint(const float accelerationNorm, const float rotationNorm);
         const bool isRotationGesture();
