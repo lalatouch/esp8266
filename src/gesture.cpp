@@ -57,7 +57,7 @@ namespace gestureNS {
     }
     
     // Recognize a gesture
-    const int gesture::recognizeGesture(){
+    const void gesture::recognizeGesture(){
         // We first detect the beginning of a rotation to give priority to this type of gesture
         if (isRotationGesture()) {
             logD("Starting to stream rotation.");

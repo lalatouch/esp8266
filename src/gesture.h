@@ -18,8 +18,10 @@ namespace gestureNS {
 
         
     public:
+        // Add a new acceleration, gyroscope and magnetometer data point
         void addNewDataPoint(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float accelerationNorm, float rotationNorm);
-        const int recognizeGesture();
+        // 
+        const void recognizeGesture();
         
     private:
         bool logDebug = true;
