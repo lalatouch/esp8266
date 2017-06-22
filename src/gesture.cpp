@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <cmath>
 #include "gesture.h"
-#include <string>
 #include <iostream>
 
 //TODO not working

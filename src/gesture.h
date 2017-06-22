@@ -10,6 +10,7 @@
 #define ____gesture__
 
 #include <vector>
+#include <string>
 
 using namespace std;
 
