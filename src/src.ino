@@ -4,6 +4,7 @@
 #include "wifi.h"
 #include "i2c.h"
 #include "http.h"
+#include "imu.h"
 #include "utils.h"
 
 int ledstate = LOW;
@@ -23,10 +24,14 @@ void setup() {
 	i2c::setup();
 	// Setup HTTP
 	http::setup();
+	// Setup IMU
+	imu::setup();
 
 	Serial.println("Ready");
 	Serial.print("IP address: ");
 	Serial.println(WiFi.localIP());
+
+	Serial.println("Ax\tAy\tAz\tGx\tGy\tGz");
 
 	utils::setTimeout([]() { led::pwm(led::RGB_R, 256); }, 1000);
 	utils::setTimeout([]() { led::pwm(led::RGB_G, 256); }, 2000);
@@ -47,6 +52,7 @@ void setup() {
 void loop() {
 	wifi::handleOTA();
 	http::handle();
+	imu::handle();
 	utils::handle();
 }
 
