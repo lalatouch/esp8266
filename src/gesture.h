@@ -27,7 +27,7 @@ namespace gestureNS {
         /* Thresholds for determining if a gesture is significative */
         
         // If a gesture has more than this threshold of uninteresting points, we consider the gesture is finished
-        static constexpr int numberOfUniterestingDataPointsThreshold = 100;
+        static constexpr int numberOfUninterestingDataPointsThreshold = 100;
         // If the rotation norm of a datapoint is superior to this threshold, it is a rotation
         static constexpr float rotationNormThreshold = 2.0f;
         // If the persentage of rotation data points is superior to this threshold in the first quarter of the gesture, it is a rotation.

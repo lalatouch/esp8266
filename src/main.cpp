@@ -13,6 +13,6 @@
 int main(int argc, char** argv)
 {
     printf("Program run\n");
-    gesture m_gesture;
+    gestureNS::gesture m_gesture;
     return 0;
 }
