@@ -9,10 +9,9 @@
 #include <stdio.h>
 #include <cmath>
 #include "gesture.h"
-#include <iostream>
 
 //TODO not working
-//#include "Arduino.h"
+#include <Arduino.h>
 
 using namespace std;
 
@@ -218,7 +217,7 @@ namespace gesture {
     // Log a string if debug mode is enabled
     void Gesture::logD(string s){
         if (logDebug) {
-            cout << s;
+			Serial.println(s.c_str());
         }
     }
 
