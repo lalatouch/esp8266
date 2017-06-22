@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include <iostream>
-#include "gesture.h"
+#include "src/gesture.h"
 
 int main(int argc, char** argv)
 {
