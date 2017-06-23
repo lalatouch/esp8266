@@ -21,7 +21,7 @@ static volatile bool readIMU = false;
 
 // Useful data structure
 typedef struct Sample {
-	float ax, ay, az, gx, gy, gz;
+	int16_t ax, ay, az, gx, gy, gz;
 } Sample;
 
 static inline uint8_t read(const uint8_t reg);
@@ -53,25 +53,25 @@ void setup() {
 
 void handle() {
 	if (readIMU) {
+		Sample sample;
+
 		// Fetch IMU data
-		mpu.readAccelData(mpu.accelCount);
-		mpu.readGyroData(mpu.gyroCount);
+		mpu.readAccelData(&sample.ax);
+		mpu.readGyroData(&sample.gx);
 
 		// Fetch resolutions
 		mpu.getAres();
 		mpu.getGres();
 
-		Sample sample = {
-			// Convert to Gs
-			(float)mpu.accelCount[0] * mpu.aRes - mpu.accelBias[0],
-			(float)mpu.accelCount[1] * mpu.aRes - mpu.accelBias[1],
-			(float)mpu.accelCount[2] * mpu.aRes - mpu.accelBias[2],
+		// Convert to Gs
+		mpu.ax = (float)sample.ax * mpu.aRes - mpu.accelBias[0];
+		mpu.ay = (float)sample.ay * mpu.aRes - mpu.accelBias[1];
+		mpu.az = (float)sample.az * mpu.aRes - mpu.accelBias[2];
 
-			// Convert to rad/s
-			((float)mpu.gyroCount[0] * mpu.gRes - mpu.gyroBias[0]) * DEG_TO_RAD,
-			((float)mpu.gyroCount[1] * mpu.gRes - mpu.gyroBias[1]) * DEG_TO_RAD,
-			((float)mpu.gyroCount[2] * mpu.gRes - mpu.gyroBias[2]) * DEG_TO_RAD
-		};
+		// Convert to rad/s
+		mpu.gx = ((float)sample.gx * mpu.gRes - mpu.gyroBias[0]) * DEG_TO_RAD;
+		mpu.gy = ((float)sample.gy * mpu.gRes - mpu.gyroBias[1]) * DEG_TO_RAD;
+		mpu.gz = ((float)sample.gz * mpu.gRes - mpu.gyroBias[2]) * DEG_TO_RAD;
 
 		// Stream sample
 		wifi::send(sample);
