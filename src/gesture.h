@@ -9,10 +9,13 @@
 #ifndef _GESTURE_H
 #define _GESTURE_H
 
+#include <array>
 #include <vector>
 #include <string>
 
 using namespace std;
+
+#define MAX_POINTS 256
 
 namespace gesture {
 
@@ -31,6 +34,11 @@ public:
 		float mx, float my, float mz
 	);
 	const void recognizeGesture();
+
+	Gesture()
+	 : dataPointsLooped(false), gestureLooped(false),
+	   dataPointsIndex(0), gestureIndex(0),
+	   dataPoints(&buffer1), currentGesture(&buffer2) {}
 
 private:
 	bool logDebug = true;
@@ -52,7 +60,10 @@ private:
 	static constexpr float shakeThreshold = 2.f * 2.f;
 	static constexpr float sumScalarProductsThreshold = 5.0f;
 
-	vector<DataPoint> dataPoints, currentGesture;
+	bool dataPointsLooped, gestureLooped;
+	int dataPointsIndex, gestureIndex;
+	array<DataPoint, MAX_POINTS> buffer1, buffer2;
+	array<DataPoint, MAX_POINTS> *dataPoints, *currentGesture;
 	int numberOfUninterestingDataPoints = 0;
 
 	vector<DataPoint> computeAccelerationDifferences(
@@ -63,12 +74,13 @@ private:
 	);
 	const bool isRotationGesture();
 	const int recognizeLinearGesture();
-	const bool isLineGesture(vector<DataPoint> normalizedAccelerationPoints);
+	const bool isLineGesture();
 	const bool isLinearGestureToTheRight();
-	bool isUnidirectionalGesture(vector<DataPoint> accelerationPoints);
+	bool isUnidirectionalGesture();
 	void analyzeCurrentData();
 	void streamRotation();
 	const float getCurrentGestureAccelerationNormSum();
+	void normalizeGesture();
 
 	// Gestures enumeration
 	enum gestures {

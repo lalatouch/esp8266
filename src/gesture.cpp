@@ -34,7 +34,12 @@ void Gesture::addNewDataPoint(
 	// Store the point only if we are already listening to a gesture or it might
 	// be the beginning of a gesture
 	if (currentState == STATE_LISTENING_GESTURE) {
-		dataPoints.push_back(newPoint);
+		(*dataPoints)[dataPointsIndex++] = newPoint;
+		if (dataPointsIndex >= MAX_POINTS) {
+			dataPointsIndex = 0;
+			dataPointsLooped = true;
+		}
+
 		if (!isInterestingDataPoint(accelerationNorm, rotationNorm)) {
 			numberOfUninterestingDataPoints++;
 			if (numberOfUninterestingDataPoints > numberOfUninterestingDataPointsThreshold) {
@@ -46,7 +51,11 @@ void Gesture::addNewDataPoint(
 	else {
 		if (isInterestingDataPoint(accelerationNorm, rotationNorm)) {
 			currentState = STATE_LISTENING_GESTURE;
-			dataPoints.push_back(newPoint);
+			(*dataPoints)[dataPointsIndex++] = newPoint;
+			if (dataPointsIndex >= MAX_POINTS) {
+				dataPointsIndex = 0;
+				dataPointsLooped = true;
+			}
 		}
 	}
 }
@@ -64,8 +73,12 @@ const bool Gesture::isInterestingDataPoint(
 
 // Analyze current data to determine if it is a gesture
 void Gesture::analyzeCurrentData() {
-	currentGesture = dataPoints;
-	dataPoints.clear();
+	// Swap buffers
+	::swap(dataPoints, currentGesture);
+	gestureIndex = dataPointsIndex;
+	gestureLooped = dataPointsLooped;
+	dataPointsIndex = 0;
+	dataPointsLooped = false;
 	recognizeGesture();
 }
 
@@ -119,11 +132,11 @@ const void Gesture::recognizeGesture() {
 //TODO: Also verify that the acceleration is low?
 const bool Gesture::isRotationGesture() {
 	float rotationNormSum = 0.0f;
-	for (int i = 0; i < currentGesture.size() / 4; i++) {
-		rotationNormSum += currentGesture[i].gNorm;
-	}
+	for (const auto &point : *currentGesture)
+		rotationNormSum += point.gNorm;
+
 	return rotationNormSum >
-	       rotationNormThresholdPercent * currentGesture.size() / 4 * rotationNormThreshold;
+	       rotationNormThresholdPercent * currentGesture->size() / 4 * rotationNormThreshold;
 }
 
 const int Gesture::recognizeLinearGesture() {
@@ -133,11 +146,11 @@ const int Gesture::recognizeLinearGesture() {
 	}
 	else {
 		// Check if the gesture is along one direction (maybe both ways) only
-		vector<DataPoint> normalizedAcceleration = normalize2DVector(currentGesture);
-		if (isLineGesture(normalizedAcceleration)) {
+		normalizeGesture();
+		if (isLineGesture()) {
 			// If it is a gesture in one way only
 			bool toTheRight = isLinearGestureToTheRight();
-			if (isUnidirectionalGesture(normalizedAcceleration)) {
+			if (isUnidirectionalGesture()) {
 				if (toTheRight)
 					return GESTURE_RIGHT;
 				else
@@ -163,9 +176,10 @@ void Gesture::streamRotation() {
 // Get the sum of the norms of each acceleration datatpoint from the gesture
 const float Gesture::getCurrentGestureAccelerationNormSum() {
 	float accelerationNormSum = 0.0f;
-	for (int i = 0; i < currentGesture.size(); i++) {
-		accelerationNormSum += currentGesture[i].aNorm;
-	}
+
+	for (const auto &point : *currentGesture)
+		accelerationNormSum += point.aNorm;
+
 	return accelerationNormSum;
 }
 
@@ -202,20 +216,24 @@ vector<Gesture::DataPoint> Gesture::normalize2DVector(vector<DataPoint> points) 
 	}
 	return result;
 }
+void Gesture::normalizeGesture() {
+	for (auto &point : *currentGesture) {
+		float norm = sqrt(point.ax * point.ax + point.ay * point.ay);
+		point.ax /= norm;
+		point.ay /= norm;
+	}
+}
 
 // Check if the acceleration gives aligned points = if the sum of all absolute
 // scalar products is close to the number of points
-const bool Gesture::isLineGesture(
-	vector<DataPoint> normalizedAccelerationPoints
-) {
+const bool Gesture::isLineGesture() {
 	float sumScalarProducts = 0.0f;
-	int pointsSize = normalizedAccelerationPoints.size();
+	int pointsSize = currentGesture->size();
 
 	for (int i = 0; i < pointsSize - 1; i++) {
-		sumScalarProducts += abs(
-			normalizedAccelerationPoints[i].ax * normalizedAccelerationPoints[i+1].ax +
-			normalizedAccelerationPoints[i].ay * normalizedAccelerationPoints[i+1].ay
-		);
+		auto &cur = (*currentGesture)[i],
+		     &next = (*currentGesture)[i+1];
+		sumScalarProducts += abs(cur.ax * next.ax + cur.ay + next.ay);
 	}
 
 	return sumScalarProducts > pointsSize - sumScalarProductsThreshold;
@@ -230,16 +248,20 @@ const bool Gesture::isLinearGestureToTheRight() {
 // Returns true if the gesture is unidirectional, else it is bi-directional =
 // check the scalar product of the mean of the first 1/4 of points with the last
 // 1/4 points
-bool
-Gesture::isUnidirectionalGesture(vector<DataPoint> accelerationPoints) {
+bool Gesture::isUnidirectionalGesture() {
 	float firstX = 0.f, firstY = 0.f, lastX = 0.f, lastY = 0.f;
-	int pointsSize = accelerationPoints.size();
+	int pointsSize = currentGesture->size();
 
-	for (int i = 0; i < pointsSize / 4; i++) {
-		firstX += accelerationPoints[i].ax;
-		firstY += accelerationPoints[i].ay;
-		lastX += accelerationPoints[pointsSize-1-i].ax;
-		lastY += accelerationPoints[pointsSize-1-i].ay;
+	for (int i = gestureLooped ? gestureIndex - 1 : 0;
+	     i < gestureIndex + (gestureLooped ? MAX_POINTS : 0);
+	     i++) {
+		const auto &first = (*currentGesture)[i % MAX_POINTS],
+		           &last = (*currentGesture)[pointsSize - 1 - (i % MAX_POINTS)];
+
+		firstX += first.ax;
+		firstY += first.ay;
+		lastX += last.ax;
+		lastY += last.ay;
 	}
 
 	float scalarProduct = firstX * lastX + firstY * lastY;
