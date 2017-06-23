@@ -21,7 +21,7 @@ void send(const uint8_t *buffer, const size_t size);
 
 template <typename T>
 void send(const T &data) {
-	send(&data, sizeof(data));
+	send((uint8_t*)&data, (size_t)sizeof(data));
 }
 
 }
