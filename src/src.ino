@@ -6,6 +6,7 @@
 #include "http.h"
 #include "imu.h"
 #include "utils.h"
+#include "input.h"
 
 int ledstate = LOW;
 
@@ -26,6 +27,8 @@ void setup() {
 	http::setup();
 	// Setup IMU
 	imu::setup();
+	// Setup the play/pause "sensor"
+	input::setup();
 
 	Serial.println("Ready");
 	Serial.print("IP address: ");
@@ -54,5 +57,6 @@ void loop() {
 	http::handle();
 	imu::handle();
 	utils::handle();
+	input::handle();
 }
 
