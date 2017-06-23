@@ -56,8 +56,8 @@ private:
 	static constexpr float rotationNormThresholdPercent = 0.75f;
 	// If the acceleration norm of a datapoint is superior to this threshold,
 	// it is a significative gesture
-	static constexpr float accelerationNormThreshold = 2.f * 2.f;
-	static constexpr float shakeThreshold = 2.f * 2.f;
+	static constexpr float accelerationNormThreshold = 3.f * 3.f;
+	static constexpr float shakeThreshold = 3.f * 3.f;
 	static constexpr float sumScalarProductsThreshold = 5.0f;
 
 	bool dataPointsLooped, gestureLooped;
@@ -65,6 +65,7 @@ private:
 	array<DataPoint, MAX_POINTS> buffer1, buffer2;
 	array<DataPoint, MAX_POINTS> *dataPoints, *currentGesture;
 	int numberOfUninterestingDataPoints = 0;
+	float aNormSum, gNormSum;
 
 	vector<DataPoint> computeAccelerationDifferences(
 		vector<DataPoint> accelerationPoints
@@ -79,8 +80,8 @@ private:
 	bool isUnidirectionalGesture();
 	void analyzeCurrentData();
 	void streamRotation();
-	const float getCurrentGestureAccelerationNormSum();
 	void normalizeGesture();
+	void computeNormSum();
 
 	// Gestures enumeration
 	enum gestures {
@@ -99,9 +100,6 @@ private:
 		STATE_LISTENING_GESTURE
 	};
 	int currentState = STATE_IDLE;
-
-	// Maths functions
-	vector<DataPoint> normalize2DVector(vector<DataPoint> points);
 
 	// Helper function
 	void logD(string s); // Log a debug string

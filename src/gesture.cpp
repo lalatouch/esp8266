@@ -84,6 +84,8 @@ void Gesture::analyzeCurrentData() {
 
 // Recognize a gesture
 const void Gesture::recognizeGesture() {
+	computeNormSum();
+
 	// We first detect the beginning of a rotation to give priority to this type
 	// of gesture
 	if (isRotationGesture()) {
@@ -131,17 +133,14 @@ const void Gesture::recognizeGesture() {
 // Returns true if the gesture has a rotation accelaration above the threshold
 //TODO: Also verify that the acceleration is low?
 const bool Gesture::isRotationGesture() {
-	float rotationNormSum = 0.0f;
-	for (const auto &point : *currentGesture)
-		rotationNormSum += point.gNorm;
-
-	return rotationNormSum >
-	       rotationNormThresholdPercent * currentGesture->size() / 4 * rotationNormThreshold;
+	return gNormSum >
+	       rotationNormThresholdPercent * currentGesture->size() / 4 * rotationNormThreshold &&
+	       aNormSum < accelerationNormThreshold;
 }
 
 const int Gesture::recognizeLinearGesture() {
 	// If the acceleration norms sum is high, the gesture is a shake gesture
-	if (getCurrentGestureAccelerationNormSum() > shakeThreshold) {
+	if (aNormSum > shakeThreshold) {
 		return GESTURE_SHAKE;
 	}
 	else {
@@ -173,14 +172,13 @@ const int Gesture::recognizeLinearGesture() {
 void Gesture::streamRotation() {
 }
 
-// Get the sum of the norms of each acceleration datatpoint from the gesture
-const float Gesture::getCurrentGestureAccelerationNormSum() {
-	float accelerationNormSum = 0.0f;
+void Gesture::computeNormSum() {
+	aNormSum = gNormSum = 0.f;
 
-	for (const auto &point : *currentGesture)
-		accelerationNormSum += point.aNorm;
-
-	return accelerationNormSum;
+	for (const auto &p : *currentGesture) {
+		aNormSum += p.aNorm;
+		gNormSum += p.gNorm;
+	}
 }
 
 // Compute the acceleration differences in the xy plane between consecutive
@@ -201,21 +199,6 @@ vector<Gesture::DataPoint> Gesture::computeAccelerationDifferences(
 	return result;
 }
 
-// Normalize the acceleration differences vector
-// Maybe apply a passe bas ?
-vector<Gesture::DataPoint> Gesture::normalize2DVector(vector<DataPoint> points) {
-	vector<DataPoint> result;
-	DataPoint newPoint;
-
-	for (int i = 0; i < points.size(); i++) {
-		float squareNorm = (points[i].ax * points[i].ax) +
-		                   (points[i].ay * points[i].ay);
-		newPoint.ax = points[i].ax / sqrt(squareNorm);
-		newPoint.ay = points[i].ay / sqrt(squareNorm);
-		result.push_back(newPoint);
-	}
-	return result;
-}
 void Gesture::normalizeGesture() {
 	for (auto &point : *currentGesture) {
 		float norm = sqrt(point.ax * point.ax + point.ay * point.ay);
