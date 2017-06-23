@@ -42,14 +42,14 @@ private:
 	static constexpr int numberOfUninterestingDataPointsThreshold = 100;
 	// If the rotation norm of a datapoint is superior to this threshold, it is
 	// a rotation
-	static constexpr float rotationNormThreshold = 2.0f;
+	static constexpr float rotationNormThreshold = 2.f * 2.f;
 	// If the persentage of rotation data points is superior to this threshold
 	// in the first quarter of the gesture, it is a rotation.
 	static constexpr float rotationNormThresholdPercent = 0.75f;
 	// If the acceleration norm of a datapoint is superior to this threshold,
 	// it is a significative gesture
-	static constexpr float accelerationNormThreshold = 2.0f;
-	static constexpr float shakeThreshold = 2.0f;
+	static constexpr float accelerationNormThreshold = 2.f * 2.f;
+	static constexpr float shakeThreshold = 2.f * 2.f;
 	static constexpr float sumScalarProductsThreshold = 5.0f;
 
 	vector<DataPoint> dataPoints, currentGesture;
