@@ -14,6 +14,16 @@ void setup();
  */
 void handleOTA();
 
+/**
+ * Sends data to the base station through UDP
+ */
+void send(const uint8_t *buffer, const size_t size);
+
+template <typename T>
+void send(const T &data) {
+	send(&data, sizeof(data));
+}
+
 }
 
 #endif

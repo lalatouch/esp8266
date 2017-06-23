@@ -1,9 +1,19 @@
 #include <ArduinoOTA.h>
 #include <WiFiManager.h>
+#include <WiFiUdp.h>
 
 #include "wifi.h"
 
 namespace wifi {
+
+// UDP thingy
+WiFiUDP udp;
+
+// Base station info
+struct {
+	IPAddress address;
+	uint16_t port;
+} base = {};
 
 void setup() {
 	// Sets up an AP if it could not connect to the last network
@@ -37,10 +47,23 @@ void setup() {
 		else if (error == OTA_END_ERROR)     Serial.println("End Failed");
 	});
 	ArduinoOTA.begin();
+
+	// Setup UDP connectivity
+	udp.begin(1414); // lala port (only the worthy will understand)
+
+	// Init the base info
+	WiFi.hostByName("192.168.1.1", base.address);
+	base.port = 1414;
 }
 
 void handleOTA() {
 	ArduinoOTA.handle();
+}
+
+void send(const uint8_t *buffer, const size_t size) {
+	udp.beginPacket(base.address, base.port);
+	udp.write(buffer, size);
+	udp.endPacket();
 }
 
 }
