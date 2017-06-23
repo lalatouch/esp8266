@@ -24,7 +24,7 @@ void Gesture::addNewDataPoint(
 ) {
 	float accelerationNorm = ax*ax + ay*ay + az*az;
 	float rotationNorm = gx*gx + gy*gy + gz*gz;
-	vector<float> newPoint {
+	DataPoint newPoint {
 		ax, ay, az,
 		gx, gy, gz,
 		mx, my, mz,
@@ -120,7 +120,7 @@ const void Gesture::recognizeGesture() {
 const bool Gesture::isRotationGesture() {
 	float rotationNormSum = 0.0f;
 	for (int i = 0; i < currentGesture.size() / 4; i++) {
-		rotationNormSum += currentGesture[i][10];
+		rotationNormSum += currentGesture[i].gNorm;
 	}
 	return rotationNormSum >
 	       rotationNormThresholdPercent * currentGesture.size() / 4 * rotationNormThreshold;
@@ -133,7 +133,7 @@ const int Gesture::recognizeLinearGesture() {
 	}
 	else {
 		// Check if the gesture is along one direction (maybe both ways) only
-		vector<vector<float>> normalizedAcceleration = normalize2DVector(currentGesture);
+		vector<DataPoint> normalizedAcceleration = normalize2DVector(currentGesture);
 		if (isLineGesture(normalizedAcceleration)) {
 			// If it is a gesture in one way only
 			bool toTheRight = isLinearGestureToTheRight();
@@ -164,23 +164,23 @@ void Gesture::streamRotation() {
 const float Gesture::getCurrentGestureAccelerationNormSum() {
 	float accelerationNormSum = 0.0f;
 	for (int i = 0; i < currentGesture.size(); i++) {
-		accelerationNormSum += currentGesture[i][9];
+		accelerationNormSum += currentGesture[i].aNorm;
 	}
 	return accelerationNormSum;
 }
 
 // Compute the acceleration differences in the xy plane between consecutive
 // data points
-vector<vector<float>> Gesture::computeAccelerationDifferences(
-	vector<vector<float>> accelerationPoints
+vector<Gesture::DataPoint> Gesture::computeAccelerationDifferences(
+	vector<DataPoint> accelerationPoints
 ) {
-	vector<vector<float>> result;
-	vector<float> newPoint;
+	vector<DataPoint> result;
+	DataPoint newPoint;
 
 	for (int i = 0; i < accelerationPoints.size() - 1; i++) {
 		newPoint = {
-			accelerationPoints[i+1][0]-accelerationPoints[i][0],
-			accelerationPoints[i+1][1]-accelerationPoints[i][1]
+			accelerationPoints[i+1].ax - accelerationPoints[i].ax,
+			accelerationPoints[i+1].ay - accelerationPoints[i].ay
 		};
 		result.push_back(newPoint);
 	}
@@ -189,16 +189,15 @@ vector<vector<float>> Gesture::computeAccelerationDifferences(
 
 // Normalize the acceleration differences vector
 // Maybe apply a passe bas ?
-vector<vector<float>> Gesture::normalize2DVector(vector<vector<float>> points) {
-	vector<vector<float>> result;
-	vector<float> newPoint;
+vector<Gesture::DataPoint> Gesture::normalize2DVector(vector<DataPoint> points) {
+	vector<DataPoint> result;
+	DataPoint newPoint;
 
 	for (int i = 0; i < points.size(); i++) {
-		float squareNorm = (points[i][0] * points[i][0]) +
-		                   (points[i][1] * points[i][1]);
-		newPoint = {
-			points[i][0] / sqrt(squareNorm), points[i][1] / sqrt(squareNorm)
-		};
+		float squareNorm = (points[i].ax * points[i].ax) +
+		                   (points[i].ay * points[i].ay);
+		newPoint.ax = points[i].ax / sqrt(squareNorm);
+		newPoint.ay = points[i].ay / sqrt(squareNorm);
 		result.push_back(newPoint);
 	}
 	return result;
@@ -207,15 +206,15 @@ vector<vector<float>> Gesture::normalize2DVector(vector<vector<float>> points) {
 // Check if the acceleration gives aligned points = if the sum of all absolute
 // scalar products is close to the number of points
 const bool Gesture::isLineGesture(
-	vector<vector<float>> normalizedAccelerationPoints
+	vector<DataPoint> normalizedAccelerationPoints
 ) {
 	float sumScalarProducts = 0.0f;
 	int pointsSize = normalizedAccelerationPoints.size();
 
 	for (int i = 0; i < pointsSize - 1; i++) {
 		sumScalarProducts += abs(
-			normalizedAccelerationPoints[i][0] * normalizedAccelerationPoints[i+1][0] +
-			normalizedAccelerationPoints[i][1] * normalizedAccelerationPoints[i+1][1]
+			normalizedAccelerationPoints[i].ax * normalizedAccelerationPoints[i+1].ax +
+			normalizedAccelerationPoints[i].ay * normalizedAccelerationPoints[i+1].ay
 		);
 	}
 
@@ -232,20 +231,18 @@ const bool Gesture::isLinearGestureToTheRight() {
 // check the scalar product of the mean of the first 1/4 of points with the last
 // 1/4 points
 bool
-Gesture::isUnidirectionalGesture(vector<vector<float>> accelerationPoints) {
-	vector<float> sumFirstPoints{ 0.0f, 0.0f };
-	vector<float> sumLastPoints{ 0.0f, 0.0f };
+Gesture::isUnidirectionalGesture(vector<DataPoint> accelerationPoints) {
+	float firstX = 0.f, firstY = 0.f, lastX = 0.f, lastY = 0.f;
 	int pointsSize = accelerationPoints.size();
 
 	for (int i = 0; i < pointsSize / 4; i++) {
-		sumFirstPoints[0] += accelerationPoints[i][0];
-		sumFirstPoints[1] += accelerationPoints[i][1];
-		sumLastPoints[0] += accelerationPoints[pointsSize-1-i][0];
-		sumLastPoints[1] += accelerationPoints[pointsSize-1-i][1];
+		firstX += accelerationPoints[i].ax;
+		firstY += accelerationPoints[i].ay;
+		lastX += accelerationPoints[pointsSize-1-i].ax;
+		lastY += accelerationPoints[pointsSize-1-i].ay;
 	}
 
-	float scalarProduct = sumFirstPoints[0] * sumLastPoints[0] +
-	                      sumFirstPoints[1] * sumLastPoints[1];
+	float scalarProduct = firstX * lastX + firstY * lastY;
 	return scalarProduct > 0;
 }
 

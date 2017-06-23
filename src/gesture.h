@@ -19,6 +19,11 @@ namespace gesture {
 class Gesture {
 
 public:
+	typedef struct DataPoint {
+		float ax, ay, az, gx, gy, gz, mx, my, mz;
+		float aNorm, gNorm;
+	} DataPoint;
+
 	// Add a new acceleration, gyroscope and magnetometer data point
 	void addNewDataPoint(
 		float ax, float ay, float az,
@@ -47,21 +52,20 @@ private:
 	static constexpr float shakeThreshold = 2.0f;
 	static constexpr float sumScalarProductsThreshold = 5.0f;
 
-	vector<vector<float>> dataPoints;
-	vector<vector<float>> currentGesture;
+	vector<DataPoint> dataPoints, currentGesture;
 	int numberOfUninterestingDataPoints = 0;
 
-	vector<vector<float>> computeAccelerationDifferences(
-		vector<vector<float>> accelerationPoints
+	vector<DataPoint> computeAccelerationDifferences(
+		vector<DataPoint> accelerationPoints
 	);
 	const bool isInterestingDataPoint(
 		const float accelerationNorm, const float rotationNorm
 	);
 	const bool isRotationGesture();
 	const int recognizeLinearGesture();
-	const bool isLineGesture(vector<vector<float>> normalizedAccelerationPoints);
+	const bool isLineGesture(vector<DataPoint> normalizedAccelerationPoints);
 	const bool isLinearGestureToTheRight();
-	bool isUnidirectionalGesture(vector<vector<float>> accelerationPoints);
+	bool isUnidirectionalGesture(vector<DataPoint> accelerationPoints);
 	void analyzeCurrentData();
 	void streamRotation();
 	const float getCurrentGestureAccelerationNormSum();
@@ -85,7 +89,7 @@ private:
 	int currentState = STATE_IDLE;
 
 	// Maths functions
-	vector<vector<float>> normalize2DVector(vector<vector<float>> points);
+	vector<DataPoint> normalize2DVector(vector<DataPoint> points);
 
 	// Helper function
 	void logD(string s); // Log a debug string
