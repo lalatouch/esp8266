@@ -31,8 +31,6 @@ void setup() {
 	Serial.print("IP address: ");
 	Serial.println(WiFi.localIP());
 
-	Serial.println("Ax\tAy\tAz\tGx\tGy\tGz");
-
 	utils::setTimeout([]() { led::pwm(led::RGB_R, 256); }, 1000);
 	utils::setTimeout([]() { led::pwm(led::RGB_G, 256); }, 2000);
 	utils::setTimeout([]() { led::pwm(led::RGB_B, 256); }, 3000);

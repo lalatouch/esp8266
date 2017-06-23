@@ -63,51 +63,8 @@ void handle() {
 		mpu.getAres();
 		mpu.getGres();
 
-		// Convert to Gs
-		mpu.ax = (float)sample.ax * mpu.aRes - mpu.accelBias[0];
-		mpu.ay = (float)sample.ay * mpu.aRes - mpu.accelBias[1];
-		mpu.az = (float)sample.az * mpu.aRes - mpu.accelBias[2];
-
-		// Convert to rad/s
-		mpu.gx = ((float)sample.gx * mpu.gRes - mpu.gyroBias[0]) * DEG_TO_RAD;
-		mpu.gy = ((float)sample.gy * mpu.gRes - mpu.gyroBias[1]) * DEG_TO_RAD;
-		mpu.gz = ((float)sample.gz * mpu.gRes - mpu.gyroBias[2]) * DEG_TO_RAD;
-
 		// Stream sample
 		wifi::send(sample);
-
-		// Compute norms
-		float acc = mpu.ax * mpu.ax + mpu.ay * mpu.ay + mpu.az * mpu.az,
-		      gyro = mpu.gx * mpu.gx + mpu.gy * mpu.gy + mpu.gz * mpu.gz;
-
-		if (1 == 2) {
-			Serial.print(sample.ax);
-			Serial.print("\t");
-			Serial.print(sample.ay);
-			Serial.print("\t");
-			Serial.print(sample.az);
-			Serial.print("\t");
-			Serial.print(sample.gx);
-			Serial.print("\t");
-			Serial.print(sample.gy);
-			Serial.print("\t");
-			Serial.print(sample.gz);
-			Serial.print("\t");
-			Serial.print(acc);
-			Serial.print("\t");
-			Serial.print(gyro);
-			Serial.print("\r");
-		}
-
-		if (acc >= 5.0) led::on(led::ONBOARD);
-		else            led::off(led::ONBOARD);
-
-		if (abs(sample.gz) >= 1.0 && abs(sample.gz) < 4.0)
-			led::pwm(led::RGB_R, 16);
-		else if (abs(sample.gz) >= 4.0)
-			led::pwm(led::RGB_R, 256);
-		else
-			led::pwm(led::RGB_R, 0);
 
 		// Clear up MPU's interrupt flag
 		read(INT_STATUS);
