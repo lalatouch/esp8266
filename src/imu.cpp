@@ -3,6 +3,7 @@
 
 #include "imu.h"
 #include "led.h"
+#include "wifi.h"
 
 // Shorthand define
 #define MPU_ADDR MPU9250_ADDRESS
@@ -17,6 +18,11 @@ static MPU9250 mpu;
 
 // Interrupt data
 static volatile bool readIMU = false;
+
+// Useful data structure
+typedef struct Sample {
+	float ax, ay, az, gx, gy, gz;
+} Sample;
 
 static inline uint8_t read(const uint8_t reg);
 static inline void write(const uint8_t reg, const uint8_t val);
@@ -55,31 +61,34 @@ void handle() {
 		mpu.getAres();
 		mpu.getGres();
 
-		// Convert to Gs
-		mpu.ax = (float)mpu.accelCount[0] * mpu.aRes - mpu.accelBias[0];
-		mpu.ay = (float)mpu.accelCount[1] * mpu.aRes - mpu.accelBias[1];
-		mpu.az = (float)mpu.accelCount[2] * mpu.aRes - mpu.accelBias[2];
-		// Convert to rad/s
-		mpu.gx = ((float)mpu.gyroCount[0] * mpu.gRes - mpu.gyroBias[0]) * DEG_TO_RAD;
-		mpu.gy = ((float)mpu.gyroCount[1] * mpu.gRes - mpu.gyroBias[1]) * DEG_TO_RAD;
-		mpu.gz = ((float)mpu.gyroCount[2] * mpu.gRes - mpu.gyroBias[2]) * DEG_TO_RAD;
+		Sample sample = {
+			// Convert to Gs
+			(float)mpu.accelCount[0] * mpu.aRes - mpu.accelBias[0],
+			(float)mpu.accelCount[1] * mpu.aRes - mpu.accelBias[1],
+			(float)mpu.accelCount[2] * mpu.aRes - mpu.accelBias[2],
+
+			// Convert to rad/s
+			((float)mpu.gyroCount[0] * mpu.gRes - mpu.gyroBias[0]) * DEG_TO_RAD,
+			((float)mpu.gyroCount[1] * mpu.gRes - mpu.gyroBias[1]) * DEG_TO_RAD,
+			((float)mpu.gyroCount[2] * mpu.gRes - mpu.gyroBias[2]) * DEG_TO_RAD
+		};
 
 		// Compute norms
 		float acc = mpu.ax * mpu.ax + mpu.ay * mpu.ay + mpu.az * mpu.az,
 		      gyro = mpu.gx * mpu.gx + mpu.gy * mpu.gy + mpu.gz * mpu.gz;
 
 		if (1 == 2) {
-			Serial.print(mpu.ax);
+			Serial.print(sample.ax);
 			Serial.print("\t");
-			Serial.print(mpu.ay);
+			Serial.print(sample.ay);
 			Serial.print("\t");
-			Serial.print(mpu.az);
+			Serial.print(sample.az);
 			Serial.print("\t");
-			Serial.print(mpu.gx);
+			Serial.print(sample.gx);
 			Serial.print("\t");
-			Serial.print(mpu.gy);
+			Serial.print(sample.gy);
 			Serial.print("\t");
-			Serial.print(mpu.gz);
+			Serial.print(sample.gz);
 			Serial.print("\t");
 			Serial.print(acc);
 			Serial.print("\t");
@@ -90,9 +99,12 @@ void handle() {
 		if (acc >= 5.0) led::on(led::ONBOARD);
 		else            led::off(led::ONBOARD);
 
-		if (abs(mpu.gz) >= 1.0 && abs(mpu.gz) < 4.0) led::pwm(led::RGB_R, 16);
-		else if (abs(mpu.gz) >= 4.0)                 led::pwm(led::RGB_R, 256);
-		else                                         led::pwm(led::RGB_R, 0);
+		if (abs(sample.gz) >= 1.0 && abs(sample.gz) < 4.0)
+			led::pwm(led::RGB_R, 16);
+		else if (abs(sample.gz) >= 4.0)
+			led::pwm(led::RGB_R, 256);
+		else
+			led::pwm(led::RGB_R, 0);
 
 		// Clear up MPU's interrupt flag
 		read(INT_STATUS);
