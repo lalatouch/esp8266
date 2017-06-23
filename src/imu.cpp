@@ -73,6 +73,9 @@ void handle() {
 			((float)mpu.gyroCount[2] * mpu.gRes - mpu.gyroBias[2]) * DEG_TO_RAD
 		};
 
+		// Stream sample
+		wifi::send(sample);
+
 		// Compute norms
 		float acc = mpu.ax * mpu.ax + mpu.ay * mpu.ay + mpu.az * mpu.az,
 		      gyro = mpu.gx * mpu.gx + mpu.gy * mpu.gy + mpu.gz * mpu.gz;
