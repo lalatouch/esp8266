@@ -6,6 +6,13 @@ namespace http {
 void setup();
 void handle();
 
+namespace client {
+
+void get(String path);
+void post(String path, String data);
+
+}
+
 }
 
 #endif
