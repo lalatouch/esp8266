@@ -49,11 +49,22 @@ void setup() {
 	ArduinoOTA.begin();
 
 	// Setup UDP connectivity
-	udp.begin(1414); // lala port (only the worthy will understand)
+	udp.begin(1415); // improved lala port (only the worthy will understand)
 
-	// Init the base info
-	WiFi.hostByName("192.168.1.1", base.address);
+	// Wait to receive a one-byte packet containing 42
+	uint8_t received = 0;
+	while (received != 42) {
+		while (udp.parsePacket() != 1);
+
+		if (udp.read(&received, 1) == 0) received = 0;
+	}
+
+	// Set the base station info
+	base.address = udp.remoteIP();
 	base.port = 1414;
+
+	Serial.print("Base station has IP address ");
+	Serial.println(base.address.toString());
 }
 
 void handleOTA() {
