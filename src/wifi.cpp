@@ -10,10 +10,7 @@ namespace wifi {
 WiFiUDP udp;
 
 // Base station info
-struct {
-	IPAddress address;
-	uint16_t port;
-} base = {};
+BaseStation base = {};
 
 void setup() {
 	// Sets up an AP if it could not connect to the last network
