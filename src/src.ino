@@ -24,8 +24,11 @@ void setup() {
 	i2c::setup();
 	// Setup HTTP
 	http::setup();
-	// Setup IMU
-	imu::setup();
+	// Setup IMU only on the demo module
+	if (ESP.getChipId() == 0x00b1e38f) {
+		Serial.println("Setting up IMU");
+		imu::setup();
+	}
 
 	Serial.println("Ready");
 	Serial.print("IP address: ");
