@@ -60,6 +60,9 @@ void setup() {
 	base.address = udp.remoteIP();
 	base.port = 1414;
 
+	// Stop UDP server
+	udp.stop();
+
 	Serial.print("Base station has IP address ");
 	Serial.println(base.address.toString());
 }
