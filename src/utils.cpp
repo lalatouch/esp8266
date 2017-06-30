@@ -131,7 +131,7 @@ String toHexString(uint32_t n) {
 
 	char ret[9] = "xxxxxxxx";
 	for (int i = 0; i < 8; i++)
-		ret[i] = nums[(n >> (4 * i)) & 0x0000000F];
+		ret[i] = nums[(n >> (4 * (7 - i))) & 0x0000000F];
 
 	return String(ret);
 }
