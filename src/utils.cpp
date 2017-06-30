@@ -123,5 +123,18 @@ void unsetInterval(int id) {
 	intervals[id].current = 0;
 }
 
+String toHexString(uint32_t n) {
+	static char nums[16] = {
+		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+		'a', 'b', 'c', 'd', 'e', 'f'
+	};
+
+	char ret[9] = "xxxxxxxx";
+	for (int i = 0; i < 8; i++)
+		ret[i] = nums[(n >> (4 * i)) & 0x0000000F];
+
+	return String(ret);
+}
+
 }
 

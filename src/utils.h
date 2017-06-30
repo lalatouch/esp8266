@@ -43,6 +43,13 @@ int setInterval(CallbackFn f, int ms, int count = -1);
  */
 void unsetInterval(int id);
 
+/**
+ * Converts a 32-bit integer to a string
+ * @param n     integer
+ * @returns     hex string representing the integer
+ */
+String toHexString(uint32_t n);
+
 }
 
 #endif

@@ -4,6 +4,7 @@
 #include "wifi.h"
 #include "http.h"
 #include "led.h"
+#include "utils.h"
 
 namespace http {
 
@@ -37,7 +38,12 @@ void setup() {
 	server.begin();
 
 	// Get API IP addr
-	apiBaseURL = String("http://") + wifi::base.address.toString() + "/api";
+	apiBaseURL = "http://" + wifi::base.address.toString() + ":3000/api";
+
+	// Self-register to the API
+	client::post("/modules/register", "\"" + utils::toHexString(ESP.getChipId()) + "\"");
+
+	Serial.println("Chip ID: " + utils::toHexString(ESP.getChipId()));
 }
 
 void handle() {
