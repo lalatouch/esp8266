@@ -62,6 +62,7 @@ void get(String path) {
 void post(String path, String data) {
 	HTTPClient http;
 	http.begin(apiBaseURL + path);
+	http.addHeader("Content-type", "application/json");
 	http.POST((uint8_t*)data.c_str(), data.length());
 	http.end();
 }
